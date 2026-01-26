@@ -1,7 +1,10 @@
 // Y-position of the floor (ground level)
 let floorY3;
 
-// Player character (soft, animated blob)
+// Items player can steal
+let items = [];
+
+// Player character (anxius blob)
 let blob3 = {
   // Position (centre of the blob)
   x: 80,
@@ -9,13 +12,13 @@ let blob3 = {
 
   // Visual properties
   r: 26, // Base radius
-  points: 48, // Number of points used to draw the blob
-  wobble: 7, // Edge deformation amount
-  wobbleFreq: 0.9,
+  points: 50, // Number of points used to draw the blob
+  wobble: 10, // Edge deformation amount
+  wobbleFreq: 0.5,
 
   // Time values for breathing animation
   t: 0,
-  tSpeed: 0.01,
+  tSpeed: 0.05,
 
   // Physics: velocity
   vx: 0, // Horizontal velocity
@@ -55,11 +58,20 @@ function setup() {
     { x: 120, y: floorY3 - 70, w: 120, h: 12 }, // low step
     { x: 300, y: floorY3 - 120, w: 90, h: 12 }, // mid step
     { x: 440, y: floorY3 - 180, w: 130, h: 12 }, // high step
+    { x: 280, y: floorY3 - 250, w: 80, h: 12 }, // highest step
     { x: 520, y: floorY3 - 70, w: 90, h: 12 }, // return ramp
   ];
 
   // Start the blob resting on the floor
   blob3.y = floorY3 - blob3.r - 1;
+
+  // Create items to steal
+  items = [
+    { x: 180, y: floorY3 - 90, r: 10 }, // on low step
+    { x: 345, y: floorY3 - 140, r: 10 }, // on mid step
+    { x: 505, y: floorY3 - 200, r: 10 }, // on high step
+    { x: 320, y: floorY3 - 270, r: 10 }, // on highest step
+  ];
 }
 
 function draw() {
@@ -69,6 +81,22 @@ function draw() {
   fill(200);
   for (const p of platforms) {
     rect(p.x, p.y, p.w, p.h);
+  }
+
+  // Draw all items
+  fill(255, 180, 0);
+  for (let item of items) {
+    ellipse(item.x, item.y, item.r * 2);
+  }
+
+  // Check if player steals an item
+  for (let i = items.length - 1; i >= 0; i--) {
+    let d = dist(blob3.x, blob3.y, items[i].x, items[i].y);
+
+    // If thief touches item = steal it
+    if (d < blob3.r + items[i].r) {
+      items.splice(i, 1); // remove stolen item
+    }
   }
 
   // --- Input: left/right movement ---
@@ -141,7 +169,11 @@ function draw() {
 
   // --- HUD ---
   fill(0);
-  text("Move: A/D or ←/→  •  Jump: Space/W/↑  •  Land on platforms", 10, 18);
+  text(
+    "Move: A/D or ←/→  •  Jump: Space/W/↑  •  Land on platforms and steal items",
+    10,
+    18,
+  );
 }
 
 // Axis-Aligned Bounding Box (AABB) overlap test
@@ -154,7 +186,7 @@ function overlap(a, b) {
 
 // Draws the blob using Perlin noise for a soft, breathing effect
 function drawBlobCircle(b) {
-  fill(20, 120, 255);
+  fill(120, 0, 255);
   beginShape();
 
   for (let i = 0; i < b.points; i++) {
