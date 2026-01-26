@@ -14,9 +14,7 @@ let blob3 = {
   r: 26, // Base radius
   points: 50, // Number of points used to draw the blob
   wobble: 10, // Edge deformation amount
-  wobbleFreq: 0.5,
-
-  // Time values for breathing animation
+  wobbleFreq: 0.5, // Time values for breathing animation
   t: 0,
   tSpeed: 0.05,
 
@@ -89,11 +87,11 @@ function draw() {
     ellipse(item.x, item.y, item.r * 2);
   }
 
-  // Check if player steals an item
+  // Check if the blob steals an item
   for (let i = items.length - 1; i >= 0; i--) {
     let d = dist(blob3.x, blob3.y, items[i].x, items[i].y);
 
-    // If thief touches item = steal it
+    // If the blob touches item = steal it
     if (d < blob3.r + items[i].r) {
       items.splice(i, 1); // remove stolen item
     }
